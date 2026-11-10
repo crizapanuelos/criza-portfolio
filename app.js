@@ -32,6 +32,9 @@ function navigateSection(hash){
  const end=Math.max(0,target.offsetTop-document.querySelector('header').offsetHeight-16);
  const distance=end-start;
  history.pushState(null,'',hash);
+ document.querySelectorAll('nav a').forEach(link=>{link.classList.toggle('nav-selected',link.hash===hash)});
+ target.classList.remove('nav-arrival');
+ if(!matchMedia('(prefers-reduced-motion: reduce)').matches){setTimeout(()=>{target.classList.add('nav-arrival');setTimeout(()=>target.classList.remove('nav-arrival'),900)},Math.min(1150,Math.max(550,Math.abs(distance)*.27)))}
  if(matchMedia('(prefers-reduced-motion: reduce)').matches){window.scrollTo({top:end,behavior:'instant'});return;}
  const duration=Math.min(1150,Math.max(550,Math.abs(distance)*.27));
  const began=performance.now();
@@ -61,3 +64,31 @@ const sectionTracker=new IntersectionObserver(entries=>{
  entries.forEach(entry=>{if(entry.isIntersecting){document.querySelectorAll('nav a').forEach(link=>{if(link.hash==='#'+entry.target.id)link.setAttribute('aria-current','location');else link.removeAttribute('aria-current')})}});
 },{rootMargin:'-20% 0px -55% 0px',threshold:0});
 document.querySelectorAll('main section[id]').forEach(section=>sectionTracker.observe(section));
+
+// Section choreography: small groups reveal in sequence as they enter the viewport.
+const motionPreference=matchMedia('(prefers-reduced-motion: reduce)');
+const featureObserver=new IntersectionObserver(entries=>entries.forEach(entry=>{
+ if(entry.isIntersecting){entry.target.classList.add('motion-visible');featureObserver.unobserve(entry.target)}
+}),{threshold:.12});
+document.querySelectorAll('.hero-top,h1,.hero-bottom,.section-intro,.about-visual,.about-tags span,.services article,.process article,.chips span,.case,.reviews h2,.reviews p,.contact-grid>div,form label,footer>*').forEach((el,i)=>{
+ el.classList.add('feature-motion');el.style.setProperty('--motion-delay',((i%4)*75)+'ms');featureObserver.observe(el);
+});
+const progress=document.createElement('div');progress.className='reading-progress';progress.setAttribute('aria-hidden','true');document.body.append(progress);
+let progressQueued=false;
+function updateProgress(){const range=document.documentElement.scrollHeight-innerHeight;progress.style.transform='scaleX('+(range>0?scrollY/range:0)+')';progressQueued=false}
+window.addEventListener('scroll',()=>{if(!progressQueued){progressQueued=true;requestAnimationFrame(updateProgress)}},{passive:true});updateProgress();
+// Pointer movement gently shifts the orbital artwork on desktop only.
+const heroArea=document.querySelector('.hero'),heroArtwork=document.querySelector('.hero-art');
+let artFrame;
+heroArea.addEventListener('pointermove',e=>{
+ if(motionPreference.matches||e.pointerType!=='mouse')return;
+ cancelAnimationFrame(artFrame);artFrame=requestAnimationFrame(()=>{const r=heroArea.getBoundingClientRect();heroArtwork.style.translate=((e.clientX-r.left)/r.width-.5)*18+'px '+((e.clientY-r.top)/r.height-.5)*12+'px'});
+});
+heroArea.addEventListener('pointerleave',()=>{cancelAnimationFrame(artFrame);heroArtwork.style.translate='0px 0px'});
+
+document.querySelectorAll('nav a').forEach(link=>{
+ link.addEventListener('click',()=>{
+  if(matchMedia('(prefers-reduced-motion: reduce)').matches)return;
+  link.animate([{transform:'translateY(-2px) scale(1)'},{transform:'translateY(1px) scale(.94)'},{transform:'translateY(-2px) scale(1)'}],{duration:420,easing:'cubic-bezier(.22,1,.36,1)'});
+ });
+});

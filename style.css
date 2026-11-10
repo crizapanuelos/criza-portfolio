@@ -32,3 +32,36 @@ nav a:hover{transform:translateY(-2px)}
 .button,.filters button,#theme{position:relative;overflow:hidden}
 @keyframes click-wave{to{transform:scale(2.5);opacity:0}}
 @media(prefers-reduced-motion:reduce){nav a:hover,.case:hover,.filters button:hover,#theme:hover,.services a:hover,.button:hover span{transform:none}.click-wave{display:none}}
+
+/* Coordinated motion for every major section. Content remains visible without JS. */
+.feature-motion{opacity:0;transform:translateY(22px);transition:opacity .75s ease var(--motion-delay,0ms),transform .85s cubic-bezier(.22,1,.36,1) var(--motion-delay,0ms)}
+.feature-motion.motion-visible{opacity:1;transform:translateY(0)}
+.reading-progress{position:fixed;top:0;left:0;height:3px;width:100%;background:var(--accent);transform-origin:left;z-index:40;pointer-events:none}
+.hero-art{transition:translate 1s cubic-bezier(.22,1,.36,1)}
+.services article{position:relative;transition:background-color .4s,transform .55s cubic-bezier(.22,1,.36,1),opacity .75s}
+.services article:hover{background:var(--panel);transform:translateY(-6px)}
+.services article>span{display:inline-block;transition:transform .5s,color .4s}
+.services article:hover>span{transform:translateX(8px)}
+.process article{position:relative}.process article::before{content:'';position:absolute;left:0;top:-2px;height:3px;width:0;background:var(--accent);transition:width 1s cubic-bezier(.22,1,.36,1) var(--motion-delay,0ms)}
+.process article.motion-visible::before{width:100%}
+.process article h3{transition:color .3s,translate .4s}.process article:hover h3{color:var(--accent);translate:0 -3px}
+.chips span{transition:opacity .65s ease var(--motion-delay),transform .65s cubic-bezier(.22,1,.36,1) var(--motion-delay),background .3s,border-color .3s}
+.chips span:hover{border-color:var(--accent);transform:translateY(-4px)}
+.about-visual{position:relative;overflow:hidden}.about-visual img{transition:transform 1.2s cubic-bezier(.22,1,.36,1)}.about-visual:hover img{transform:scale(1.045)}
+form label{position:relative}form input,form textarea,form select{transition:border-color .3s,background-color .3s,padding-left .3s}
+form input:focus,form textarea:focus,form select:focus{padding-left:10px;background:#ffffff18;border-color:var(--ink)}
+footer a:hover{color:var(--accent);transform:translateY(-3px)}
+@media(prefers-reduced-motion:reduce){.feature-motion{opacity:1;transform:none;transition:none!important}.hero-art{translate:none!important}.process article::before{transition:none}.about-visual:hover img,.chips span:hover,.services article:hover{transform:none}.process article:hover h3{translate:none}}
+@media print{.feature-motion,.reveal{opacity:1;transform:none}.reading-progress{display:none}}
+
+/* Navigation-specific motion: hover, press, active marker, and destination arrival. */
+nav a{isolation:isolate;transition:color .3s,background-color .35s,transform .4s cubic-bezier(.22,1,.36,1)}
+nav a::after{bottom:0;left:10px;width:calc(100% - 20px);height:2px;transform-origin:center;transition:transform .45s cubic-bezier(.22,1,.36,1)}
+nav a:hover,nav a:focus-visible{transform:translateY(-3px);box-shadow:0 6px 18px #00000012}
+nav a.nav-selected::after,nav a[aria-current="location"]::after{transform:scaleX(1)}
+nav a.nav-selected{color:var(--accent)}
+.nav-arrival h2{animation:nav-heading-arrive .8s cubic-bezier(.22,1,.36,1) both}
+.nav-arrival .eyebrow{animation:nav-label-arrive .65s ease both}
+@keyframes nav-heading-arrive{from{opacity:.45;translate:0 16px}to{opacity:1;translate:0 0}}
+@keyframes nav-label-arrive{from{opacity:.35;letter-spacing:3px}to{opacity:1;letter-spacing:2px}}
+@media(prefers-reduced-motion:reduce){nav a:hover,nav a:focus-visible{transform:none}.nav-arrival h2,.nav-arrival .eyebrow{animation:none}}
