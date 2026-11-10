@@ -1,3 +1,4 @@
+function reducedMotion(){return !document.body.classList.contains('motion-enabled') && matchMedia('(prefers-reduced-motion: reduce)').matches}
 const projects=[
 {id:'urban',name:'Urban Threads',category:'Web',type:'Landing page & campaign',industry:'Fashion / streetwear',images:['urban','banner'],intro:'A back-to-school collection with an unmistakable streetwear attitude.',problem:'Create a clear campaign hierarchy while giving the product a strong visual presence.',research:'Visual analysis of the supplied artwork: monochrome product imagery, muted green accents, condensed headlines, and orbital motifs.',strategy:'Let the apparel lead. Use scale, contrast, and a direct call to action to make the collection easy to understand.',process:'The supplied campaign brings a large headline, product composition, and supporting brand details into one cohesive layout.',solution:'A bold collection headline anchors the page, while overlapping apparel imagery establishes the visual world.',outcome:'Final design artwork supplied by the designer. Launch status and conversion results have not been provided.'},
 {id:'enimal',name:'Enimal Clothing Line',category:'Visual',type:'Typography & poster design',industry:'Fashion / editorial',images:['enimal'],intro:'Texture, movement, and expressive type for a clothing identity.',problem:'Make the brand name memorable within a richly textured composition.',research:'The supplied poster pairs olive neutrals with fabric-like texture and flowing contour lines.',strategy:'Use dimensional typography as the focal point and let the line work create movement.',process:'Oversized layered lettering sits over a textured neutral field, with supporting type and star accents.',solution:'A high-impact poster that makes typography the central brand asset.',outcome:'Completed poster artwork. Audience response and campaign metrics were not supplied.'},
@@ -7,18 +8,18 @@ const projects=[
 {id:'olive',name:'Olive Studio',category:'Brand',type:'Brand direction exploration',industry:'Creative studio / concept',concept:true,visual:'olive',intro:'A playful identity study extending the original olive and star vocabulary.',problem:'Explore an adaptable identity with bold typographic presence.',research:'Draws from the original poster’s confident lettering and the mood board’s olive shades.',strategy:'Use oversized type, a simple symbol, and a focused two-color palette.',process:'A graphic cover study tests contrast and typographic scale.',solution:'A bold, compact art direction for future identity applications.',outcome:'Illustrative concept created for this portfolio. No client, launch, or measured results.'}
 ];
 let category='All';const grid=document.querySelector('#projects');const visual=p=>p.concept?`<div class="concept ${p.visual==='olive'?'olive':''}"><span>${p.visual==='olive'?'INDEPENDENT IN SPIRIT':'A CONSIDERED WAY OF LIVING'}</span><b>${p.visual==='olive'?'olive<br>studio ✦':'Form<br>& Field.'}</b><span>${p.visual==='olive'?'BRAND DIRECTION / 2026':'OBJECTS. SPACES. PERSPECTIVES.'}</span></div>`:`<img src="${p.images[0]}.jpg" alt="${p.name} — ${p.type}" loading="lazy" width="800" height="600">`;
-function render(){let q=document.querySelector('#search').value.toLowerCase();let list=projects.filter(p=>(category==='All'||p.category===category)&&`${p.name} ${p.type} ${p.industry}`.toLowerCase().includes(q));grid.innerHTML=list.map(p=>`<button class="project" data-project="${p.id}" aria-label="Explore ${p.name}"><div class="project-visual">${visual(p)}${p.concept?'<span class="badge">CONCEPT EXPLORATION</span>':''}</div><div class="project-meta"><div><h3>${p.name}</h3><p>${p.type}</p></div><span class="project-arrow" aria-hidden="true">↗</span></div></button>`).join('');document.querySelector('#empty').hidden=!!list.length;if(!matchMedia('(prefers-reduced-motion: reduce)').matches)grid.querySelectorAll('.project').forEach((card,i)=>card.animate([{opacity:0,transform:'translateY(18px)'},{opacity:1,transform:'translateY(0)'}],{duration:450,delay:i*45,easing:'cubic-bezier(.22,1,.36,1)',fill:'backwards'}))}
+function render(){let q=document.querySelector('#search').value.toLowerCase();let list=projects.filter(p=>(category==='All'||p.category===category)&&`${p.name} ${p.type} ${p.industry}`.toLowerCase().includes(q));grid.innerHTML=list.map(p=>`<button class="project" data-project="${p.id}" aria-label="Explore ${p.name}"><div class="project-visual">${visual(p)}${p.concept?'<span class="badge">CONCEPT EXPLORATION</span>':''}</div><div class="project-meta"><div><h3>${p.name}</h3><p>${p.type}</p></div><span class="project-arrow" aria-hidden="true">↗</span></div></button>`).join('');document.querySelector('#empty').hidden=!!list.length;if(!reducedMotion())grid.querySelectorAll('.project').forEach((card,i)=>card.animate([{opacity:0,transform:'translateY(18px)'},{opacity:1,transform:'translateY(0)'}],{duration:450,delay:i*45,easing:'cubic-bezier(.22,1,.36,1)',fill:'backwards'}))}
 document.querySelectorAll('[data-filter]').forEach(b=>b.addEventListener('click',()=>{category=b.dataset.filter;document.querySelectorAll('[data-filter]').forEach(x=>{x.classList.toggle('active',x===b);x.setAttribute('aria-pressed',x===b)});render()}));document.querySelector('#search').addEventListener('input',render);render();
-const dialog=document.querySelector('dialog');let priorFocus;function openProject(id,update=true){let p=projects.find(x=>x.id===id);if(!p)return;priorFocus=document.activeElement;document.querySelector('#project-content').innerHTML=`<span class="eyebrow">${p.concept?'CONCEPT EXPLORATION':'SELECTED WORK'} / ${p.industry}</span><h2>${p.name}</h2><p>${p.intro}</p><div id="gallery">${p.concept?visual(p):`<img class="detail-img" src="${p.images[0]}.jpg" alt="${p.name} design preview">`}</div>${p.images?.length>1?'<div class="detail-controls"><button id="previous">← Previous image</button><span id="image-count" aria-live="polite">1 / '+p.images.length+'</span><button id="next">Next image →</button></div>':''}<div class="detail-grid">${[['Problem',p.problem],['Research / visual observations',p.research],['Strategy',p.strategy],['Design process',p.process],['Final design / solution',p.solution],['Outcome',p.outcome],['Tools',p.concept?'HTML & CSS composition.':'Original authoring tools were not specified in the supplied files.']].map(([a,b])=>`<article><h3>${a}</h3><p>${b}</p></article>`).join('')}</div><a class="text-link" href="#contact" id="discuss">Discuss a similar project ↗</a>`;let idx=0;function imageStep(n){idx=(idx+n+p.images.length)%p.images.length;const img=document.querySelector('#gallery img');img.src=`${p.images[idx]}.jpg`;if(!matchMedia('(prefers-reduced-motion: reduce)').matches)img.animate([{opacity:.15,transform:'translateX(10px)'},{opacity:1,transform:'translateX(0)'}],{duration:350,easing:'ease-out'});document.querySelector('#image-count').textContent=`${idx+1} / ${p.images.length}`}document.querySelector('#previous')?.addEventListener('click',()=>imageStep(-1));document.querySelector('#next')?.addEventListener('click',()=>imageStep(1));document.querySelector('#discuss').onclick=()=>closeProject();if(!dialog.open){dialog.classList.remove('closing');dialog.showModal();}document.body.style.overflow='hidden';dialog.scrollTop=0;if(update)history.pushState(null,'',`#project/${id}`)}
+const dialog=document.querySelector('dialog');let priorFocus;function openProject(id,update=true){let p=projects.find(x=>x.id===id);if(!p)return;priorFocus=document.activeElement;document.querySelector('#project-content').innerHTML=`<span class="eyebrow">${p.concept?'CONCEPT EXPLORATION':'SELECTED WORK'} / ${p.industry}</span><h2>${p.name}</h2><p>${p.intro}</p><div id="gallery">${p.concept?visual(p):`<img class="detail-img" src="${p.images[0]}.jpg" alt="${p.name} design preview">`}</div>${p.images?.length>1?'<div class="detail-controls"><button id="previous">← Previous image</button><span id="image-count" aria-live="polite">1 / '+p.images.length+'</span><button id="next">Next image →</button></div>':''}<div class="detail-grid">${[['Problem',p.problem],['Research / visual observations',p.research],['Strategy',p.strategy],['Design process',p.process],['Final design / solution',p.solution],['Outcome',p.outcome],['Tools',p.concept?'HTML & CSS composition.':'Original authoring tools were not specified in the supplied files.']].map(([a,b])=>`<article><h3>${a}</h3><p>${b}</p></article>`).join('')}</div><a class="text-link" href="#contact" id="discuss">Discuss a similar project ↗</a>`;let idx=0;function imageStep(n){idx=(idx+n+p.images.length)%p.images.length;const img=document.querySelector('#gallery img');img.src=`${p.images[idx]}.jpg`;if(!reducedMotion())img.animate([{opacity:0,transform:'translateX(45px)',filter:'blur(6px)'},{opacity:1,transform:'translateX(0)',filter:'blur(0)'}],{duration:650,easing:'cubic-bezier(.22,1,.36,1)'});document.querySelector('#image-count').textContent=`${idx+1} / ${p.images.length}`}document.querySelector('#previous')?.addEventListener('click',()=>imageStep(-1));document.querySelector('#next')?.addEventListener('click',()=>imageStep(1));document.querySelector('#discuss').onclick=()=>closeProject();if(!dialog.open){dialog.classList.remove('closing');dialog.showModal();}document.body.style.overflow='hidden';dialog.scrollTop=0;if(update)history.pushState(null,'',`#project/${id}`)}
 document.addEventListener('click',e=>{let b=e.target.closest('[data-project]');if(b)openProject(b.dataset.project)});document.querySelector('.close').onclick=()=>closeProject();dialog.addEventListener('click',e=>{if(e.target===dialog){const r=dialog.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)closeProject()}});dialog.addEventListener('close',()=>{document.body.style.overflow='';if(location.hash.startsWith('#project/'))history.replaceState(null,'','#work');priorFocus?.focus({preventScroll:true})});window.addEventListener('popstate',()=>{if(location.hash.startsWith('#project/'))openProject(location.hash.split('/')[1],false);else dialog.close()});if(location.hash.startsWith('#project/'))openProject(location.hash.split('/')[1],false);
 const theme=document.querySelector('#theme');function setTheme(light){document.body.classList.toggle('light',light);theme.setAttribute('aria-label',`Switch to ${light?'dark':'light'} mode`);theme.textContent=light?'☾':'☼';try{localStorage.setItem('ja-theme',light?'light':'dark')}catch{}}try{setTheme(localStorage.getItem('ja-theme')==='light')}catch{}theme.onclick=()=>setTheme(!document.body.classList.contains('light'));
 document.querySelector('#contact-form').addEventListener('submit',e=>{e.preventDefault();const data=new FormData(e.target);const content=`PROJECT BRIEF FOR CRIZA PANUELOS\n\nName: ${data.get('name')}\nEmail: ${data.get('email')}\nProject: ${data.get('service')}\n\n${data.get('message')}\n\nThis brief was downloaded locally and has not been sent.\n`;const url=URL.createObjectURL(new Blob([content],{type:'text/plain'}));let a=document.createElement('a');a.href=url;a.download='project-brief.txt';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);document.querySelector('#form-status').textContent='Your brief has been downloaded. It has not been sent; direct contact details are pending.'});
-const observer=new IntersectionObserver(entries=>entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('visible');observer.unobserve(e.target)}}),{threshold:.08});document.querySelectorAll('section:not(.hero)').forEach(s=>{s.classList.add('reveal');observer.observe(s)});
+const observer=new IntersectionObserver(entries=>entries.forEach(e=>{e.target.classList.toggle('visible',e.isIntersecting)}),{threshold:.08});document.querySelectorAll('section:not(.hero)').forEach(s=>{s.classList.add('reveal');observer.observe(s)});
 
 // Motion is interruptible and respects the visitor's accessibility preferences.
 function closeProject(){
  if(!dialog.open || dialog.classList.contains('closing')) return;
- if(matchMedia('(prefers-reduced-motion: reduce)').matches){dialog.close();return;}
+ if(reducedMotion()){dialog.close();return;}
  dialog.classList.add('closing');
  setTimeout(()=>{dialog.close();dialog.classList.remove('closing')},220);
 }
@@ -34,8 +35,8 @@ function navigateSection(hash){
  history.pushState(null,'',hash);
  document.querySelectorAll('nav a').forEach(link=>{link.classList.toggle('nav-selected',link.hash===hash)});
  target.classList.remove('nav-arrival');
- if(!matchMedia('(prefers-reduced-motion: reduce)').matches){setTimeout(()=>{target.classList.add('nav-arrival');setTimeout(()=>target.classList.remove('nav-arrival'),900)},Math.min(1150,Math.max(550,Math.abs(distance)*.27)))}
- if(matchMedia('(prefers-reduced-motion: reduce)').matches){window.scrollTo({top:end,behavior:'instant'});return;}
+ if(!reducedMotion()){setTimeout(()=>{target.classList.add('nav-arrival');setTimeout(()=>target.classList.remove('nav-arrival'),900)},Math.min(1150,Math.max(550,Math.abs(distance)*.27)))}
+ if(reducedMotion()){window.scrollTo({top:end,behavior:'instant'});return;}
  const duration=Math.min(1150,Math.max(550,Math.abs(distance)*.27));
  const began=performance.now();
  function step(now){const t=Math.min(1,(now-began)/duration);const eased=t<.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2;window.scrollTo({top:start+distance*eased,behavior:'instant'});if(t<1)scrollFrame=requestAnimationFrame(step);}
@@ -54,7 +55,7 @@ window.addEventListener('keydown',e=>{if(['ArrowDown','ArrowUp','PageDown','Page
 // A quiet pressed-state pulse gives mouse and touch interactions a clear response.
 document.addEventListener('click',e=>{
  const control=e.target.closest('.button,.filters button,#theme');
- if(!control||matchMedia('(prefers-reduced-motion: reduce)').matches)return;
+ if(!control||reducedMotion())return;
  const rect=control.getBoundingClientRect(),size=Math.max(rect.width,rect.height);
  const wave=document.createElement('span');wave.className='click-wave';wave.setAttribute('aria-hidden','true');
  Object.assign(wave.style,{width:size+'px',height:size+'px',left:((e.detail?e.clientX-rect.left:rect.width/2)-size/2)+'px',top:((e.detail?e.clientY-rect.top:rect.height/2)-size/2)+'px'});
@@ -68,7 +69,7 @@ document.querySelectorAll('main section[id]').forEach(section=>sectionTracker.ob
 // Section choreography: small groups reveal in sequence as they enter the viewport.
 const motionPreference=matchMedia('(prefers-reduced-motion: reduce)');
 const featureObserver=new IntersectionObserver(entries=>entries.forEach(entry=>{
- if(entry.isIntersecting){entry.target.classList.add('motion-visible');featureObserver.unobserve(entry.target)}
+ entry.target.classList.toggle('motion-visible',entry.isIntersecting)
 }),{threshold:.12});
 document.querySelectorAll('.hero-top,h1,.hero-bottom,.section-intro,.about-visual,.about-tags span,.services article,.process article,.chips span,.case,.reviews h2,.reviews p,.contact-grid>div,form label,footer>*').forEach((el,i)=>{
  el.classList.add('feature-motion');el.style.setProperty('--motion-delay',((i%4)*75)+'ms');featureObserver.observe(el);
@@ -88,7 +89,29 @@ heroArea.addEventListener('pointerleave',()=>{cancelAnimationFrame(artFrame);her
 
 document.querySelectorAll('nav a').forEach(link=>{
  link.addEventListener('click',()=>{
-  if(matchMedia('(prefers-reduced-motion: reduce)').matches)return;
+  if(reducedMotion())return;
   link.animate([{transform:'translateY(-2px) scale(1)'},{transform:'translateY(1px) scale(.94)'},{transform:'translateY(-2px) scale(1)'}],{duration:420,easing:'cubic-bezier(.22,1,.36,1)'});
  });
 });
+
+// Explicit visitor control also works when the device requests reduced motion.
+const motionControl=document.createElement('button');
+motionControl.className='motion-control';motionControl.type='button';motionControl.textContent='▶ Enable & preview animations';
+motionControl.setAttribute('aria-label','Enable and preview website animations');document.body.append(motionControl);
+motionControl.addEventListener('click',()=>{
+ document.body.classList.add('motion-enabled');
+ motionControl.textContent='↻ Replay animations';
+ const destination=document.querySelector(location.hash && !location.hash.startsWith('#project/')?location.hash:'.hero')||document.querySelector('.hero');
+ destination.querySelectorAll('h1,h2,p,.eyebrow,.about-visual,.services article,.process article,.chips span').forEach((el,i)=>{
+  el.animate([{opacity:0,transform:'translateY(55px) scale(.97)'},{opacity:1,transform:'translateY(0) scale(1)'}],{duration:1100,delay:Math.min(i*110,550),easing:'cubic-bezier(.16,1,.3,1)',fill:'backwards'});
+ });
+});
+
+// Layered image reveals give each portfolio item a tangible preview state.
+function enhanceProjectPreviews(){
+ document.querySelectorAll('.project-visual').forEach(visual=>{
+  if(visual.querySelector('.preview-caption'))return;
+  const caption=document.createElement('span');caption.className='preview-caption';caption.innerHTML='<span>EXPLORE THE PROJECT</span><b>View design story ↗</b>';caption.setAttribute('aria-hidden','true');visual.append(caption);
+ });
+}
+enhanceProjectPreviews();new MutationObserver(enhanceProjectPreviews).observe(grid,{childList:true});
